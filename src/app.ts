@@ -3,8 +3,8 @@ import express, {
 } from 'express';
 import cors from 'cors';
 
-import { UserRoutes } from './app/modules/user/user.route';
 import globalErrorHandelar from './app/middlewares/globalErrorHandeler';
+import routers from './app/routes';
 
 const app: Application = express();
 
@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //Application routes
-app.use('/api/v1/users', UserRoutes);
+app.use('/api/v1/', routers);
 
 //initially connect
 // app.get('/', (req: Request, res: Response , next: NextFunction) => {
