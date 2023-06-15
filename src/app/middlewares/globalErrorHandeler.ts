@@ -8,8 +8,9 @@ import ApiError from '../../errors/ApiError';
 import { errorlogger } from '../../shared/logger';
 import { ZodError } from 'zod';
 import handelZodError from '../../errors/handelZodError';
+import handelCastError from '../../errors/handelCastError';
 
-const globalErrorHandelar: ErrorRequestHandler = (error, req, res, next) => {
+const globalErrorHandelar: ErrorRequestHandler = (error, req, res) => {
   config.env === 'development'
     ? console.log('globalErrorHandler ', error)
     : errorlogger.error('globalErrorHandler ', error);
@@ -25,6 +26,11 @@ const globalErrorHandelar: ErrorRequestHandler = (error, req, res, next) => {
     errorMessages = simplifiedError?.errorMessages;
   } else if (error instanceof ZodError) {
     const simplifiedError = handelZodError(error);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorMessages = simplifiedError?.errorMessages;
+  } else if (error.name === 'CastError') {
+    const simplifiedError = handelCastError(error);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorMessages = simplifiedError?.errorMessages;
@@ -57,8 +63,6 @@ const globalErrorHandelar: ErrorRequestHandler = (error, req, res, next) => {
     errorMessages,
     stack: config.env !== 'production' ? error?.stack : undefined,
   });
-
-  next();
 };
 
 export default globalErrorHandelar;
