@@ -18,6 +18,7 @@ const globalErrorHandelar: ErrorRequestHandler = (error, req, res) => {
   let statusCode = 500;
   let message = 'Somting went wrong !';
   let errorMessages: IGenericErrorMessage[] = [];
+  console.log('this is global handel errors');
 
   if (error?.name === 'ValidationError') {
     const simplifiedError = handelValidationError(error);

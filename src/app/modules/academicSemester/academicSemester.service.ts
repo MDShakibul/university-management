@@ -136,9 +136,20 @@ const updateSemester = async (
   return result;
 };
 
+const deleteSemesters = async (
+  id: string
+): Promise<IAcademicSemester | null> => {
+  const result = await AcademicSemester.findByIdAndDelete(id);
+  if (!result) {
+    throw new ApiError(400, 'Failed to create semester!');
+  }
+  return result;
+};
+
 export const AcademicSemesterService = {
   createSemester,
   getAllSemesters,
   getSingleSemester,
   updateSemester,
+  deleteSemesters,
 };
