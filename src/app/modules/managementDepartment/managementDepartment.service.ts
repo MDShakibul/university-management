@@ -2,30 +2,36 @@ import { SortOrder } from 'mongoose';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
-import { academicDepartmentSearchableFields } from './academicDepartment.constant';
+import { managementDepartmentSearchableFields } from './managementDepartment.constant';
 import {
-  IAcademicDepartment,
-  IAcademicDepartmentFilters,
-} from './academicDepartment.interface';
-import { AcademicDepartment } from './academicDepartment.model';
+  IManagementDepartment,
+  IManagementDepartmentFilters,
+} from './managementDepartment.interface';
+import { ManagementDepartment } from './managementDepartment.model';
+
+const createDepartment = async (
+  payload: IManagementDepartment
+): Promise<IManagementDepartment | null> => {
+  const result = await ManagementDepartment.create(payload);
+  return result;
+};
 
 const getAllDepartments = async (
-  filters: IAcademicDepartmentFilters,
+  filters: IManagementDepartmentFilters,
   paginationOptions: IPaginationOptions
-): Promise<IGenericResponse<IAcademicDepartment[]>> => {
-  const { limit, page, skip, sortBy, sortOrder } =
-    paginationHelpers.calculatePagination(paginationOptions);
-
+): Promise<IGenericResponse<IManagementDepartment[]>> => {
   const { searchTerm, ...filtersData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
 
   const andConditions = [];
 
   if (searchTerm) {
     andConditions.push({
-      $or: academicDepartmentSearchableFields.map(field => ({
+      $or: managementDepartmentSearchableFields.map(field => ({
         [field]: {
           $regex: searchTerm,
-          $paginationOptions: 'i',
+          $options: 'i',
         },
       })),
     });
@@ -47,13 +53,12 @@ const getAllDepartments = async (
   const whereConditions =
     andConditions.length > 0 ? { $and: andConditions } : {};
 
-  const result = await AcademicDepartment.find(whereConditions)
-    .populate('academicFaculty')
+  const result = await ManagementDepartment.find(whereConditions)
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
 
-  const total = await AcademicDepartment.countDocuments();
+  const total = await ManagementDepartment.countDocuments();
 
   return {
     meta: {
@@ -65,49 +70,38 @@ const getAllDepartments = async (
   };
 };
 
-const createDepartment = async (
-  payload: IAcademicDepartment
-): Promise<IAcademicDepartment | null> => {
-  const result = (await AcademicDepartment.create(payload)).populate(
-    'academicFaculty'
-  );
-  return result;
-};
-
 const getSingleDepartment = async (
   id: string
-): Promise<IAcademicDepartment | null> => {
-  const result = await AcademicDepartment.findById(id).populate(
-    'academicFaculty'
-  );
+): Promise<IManagementDepartment | null> => {
+  const result = await ManagementDepartment.findById(id);
   return result;
 };
 
 const updateDepartment = async (
   id: string,
-  payload: Partial<IAcademicDepartment>
-): Promise<IAcademicDepartment | null> => {
-  const result = await AcademicDepartment.findOneAndUpdate(
+  payload: Partial<IManagementDepartment>
+): Promise<IManagementDepartment | null> => {
+  const result = await ManagementDepartment.findOneAndUpdate(
     { _id: id },
     payload,
     {
       new: true,
     }
-  ).populate('academicFaculty');
+  );
   return result;
 };
 
 const deleteDepartment = async (
   id: string
-): Promise<IAcademicDepartment | null> => {
-  const result = await AcademicDepartment.findByIdAndDelete(id);
+): Promise<IManagementDepartment | null> => {
+  const result = await ManagementDepartment.findByIdAndDelete(id);
   return result;
 };
 
-export const AcademicDepartmentService = {
+export const ManagementDepartmentService = {
+  createDepartment,
   getAllDepartments,
   getSingleDepartment,
   updateDepartment,
   deleteDepartment,
-  createDepartment,
 };

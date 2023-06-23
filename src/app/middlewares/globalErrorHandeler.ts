@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-console */
 import { ErrorRequestHandler, NextFunction } from 'express';
@@ -10,7 +12,6 @@ import { ZodError } from 'zod';
 import handelZodError from '../../errors/handelZodError';
 import handelCastError from '../../errors/handelCastError';
 
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 const globalErrorHandelar: ErrorRequestHandler = (
   error,
   req,

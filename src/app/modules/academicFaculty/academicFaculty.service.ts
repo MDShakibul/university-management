@@ -41,7 +41,7 @@ const getAllFaculty = async (
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<IAcademicFaculty[]>> => {
   const { page, limit, skip, sortBy, sortOrder } =
-    paginationHelpers.calulatePagination(paginationOptions);
+    paginationHelpers.calculatePagination(paginationOptions);
 
   const { searchTerm, ...filtersData } = filters;
 
