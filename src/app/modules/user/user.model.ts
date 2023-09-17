@@ -23,6 +23,9 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
       type: Boolean,
       default: true,
     },
+    passwordChangedAt: {
+      type: Date,
+    },
     student: {
       type: Schema.Types.ObjectId,
       ref: 'Student',
@@ -44,11 +47,26 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
   }
 );
 
-UserSchema.pre('save', async function (next) {
+/* UserSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(
     this.password,
     Number(config.bycrypt_salt_rounds)
   );
+
+  next();
+}); */
+
+// User.create() / user.save()
+UserSchema.pre('save', async function (next) {
+  // Hashing user password
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bycrypt_salt_rounds)
+  );
+
+  if (!this.needsPasswordChange) {
+    this.passwordChangedAt = new Date();
+  }
 
   next();
 });
@@ -66,7 +84,7 @@ UserSchema.methods.isPasswordMatched = async function (
   givenPassword: string,
   savedPassword: string
 ): Promise<boolean> {
-  return bcrypt.compare(givenPassword, savedPassword);
+  return await bcrypt.compare(givenPassword, savedPassword);
 };
 
 export const User = model<IUser, UserModel>('User', UserSchema);
